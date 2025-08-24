@@ -168,7 +168,7 @@ elif choice == 'Build Project':
 elif choice == 'New Prediction':
     st.subheader("Select data")
     lines = None
-    type = st.radio("Upload data or Input data?", options=("Upload", "Input","upload , Predict by product code"))
+    type = st.radio("Upload data or Input data?", options=("Upload", "Input"))
     flag = False
     if type=="Upload":
         # Upload file
@@ -236,74 +236,6 @@ elif choice == 'New Prediction':
                 lines['Predict'] = y_pred_new
                 st.dataframe(lines)
 
-    if type=="upload , Predict by product code":
-        # Upload file
-        st.write('Only supports csv and txt files , must have column ma_san_pham')
-        uploaded_file_1 = st.file_uploader("Choose a file",type=['txt', 'csv'])
-        if uploaded_file_1 is not None:
-            lines = pd.read_csv(uploaded_file_1,header=None,names=['noi_dung_binh_luan','ma_san_pham'],)                  
-            
-            # lấy random sản phẩm
-            st.session_state.random_products = lines
-
-            # Kiểm tra xem 'selected_ma_san_pham' đã có trong session_state hay chưa
-            if 'selected_ma_san_pham' not in st.session_state:
-                # Nếu chưa có, thiết lập giá trị mặc định là None hoặc ID sản phẩm đầu tiên
-                st.session_state.selected_ma_san_pham = None
-
-            # Theo cách cho người dùng chọn sản phẩm từ dropdown
-            # Tạo một tuple cho mỗi sản phẩm, trong đó phần tử đầu là tên và phần tử thứ hai là ID
-            product_options = [(row['noi_dung_binh_luan'], row['ma_san_pham']) for index, row in st.session_state.random_products.iterrows()]
-            st.session_state.random_products
-            # Tạo một dropdown với options là các tuple này
-            selected_product = st.selectbox(
-                "Chọn sản phẩm",
-                options=product_options,
-                format_func=lambda x: x[1]
-            )
-            # Display the selected product
-            st.write("Bạn đã chọn:", selected_product)
-
-            # Cập nhật session_state dựa trên lựa chọn hiện tại
-            st.session_state.selected_ma_san_pham = selected_product[1]
-
-            if st.session_state.selected_ma_san_pham:
-                st.write("ma_san_pham: ", st.session_state.selected_ma_san_pham)
-                # Hiển thị thông tin sản phẩm được chọn
-                selected_product = lines[lines['ma_san_pham'] == st.session_state.selected_ma_san_pham]
-
-                if not selected_product.empty:
-                    st.write('#### Bạn vừa chọn:')
-                    st.write('### ', selected_product)
-                    # lấy độ dài chuỗi
-                    selected_product['length'] = selected_product['noi_dung_binh_luan'].map(lambda x : len(x))
-
-                    # Xử lý text
-                    process_text(selected_product, emoji_dict, teen_dict, wrong_lst, stopwords_lst, english_dict)
-                    process_sentiment(selected_product, words_count,positive_VN_lst,negative_VN_lst)
-
-                    # chuẩn text
-                    x_new = model_tfidf.transform(selected_product['noi_dung_binh_luan'])
-                    X_final = hstack([x_new, selected_product[['length','positive_count','negative_count']]]) 
-
-                    # Dự đoán
-                    st.write("After Predict : ")
-                    st.write("New predictions (1: positive, 0: negative): ")       
-                    y_pred_new = model.predict(X_final)       
-                    selected_product['Predict'] = y_pred_new
-                    st.dataframe(selected_product)
-
-                    #download
-                    csv = convert_df(selected_product) 
-                    st.download_button(
-                    label="Download data as CSV",
-                    data=csv,
-                    file_name="output.csv",
-                    mime="csv"
-                    )   
-
-                else:
-                    st.write(f"Không tìm thấy sản phẩm với ID: {st.session_state.selected_ma_san_pham}")
 
 elif choice == 'Product Search':
     # lấy random sản phẩm
