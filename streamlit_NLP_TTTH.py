@@ -118,9 +118,10 @@ menu = ["Business Objective", "Build Project", "New Prediction","Product Search"
 choice = st.sidebar.selectbox('Menu', menu)
 st.sidebar.write("""#### Thành viên thực hiện:\n
                 Trần Đăng Diệp """)
-st.sidebar.write("""#### Giảng viên hướng dẫn: 
+st.sidebar.write("""#### Giảng viên hướng dẫn:\n
+                 ThS. Vương Xuân Chí
                         """)
-st.sidebar.write("""#### Thời gian thực hiện: 4/6/2025""")
+st.sidebar.write("""#### Thời gian thực hiện: 8/2025""")
 if choice == 'Business Objective':    
     st.subheader("Business Objective")
     st.write("""
